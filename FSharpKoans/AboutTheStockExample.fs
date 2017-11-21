@@ -27,6 +27,8 @@ open FSharpKoans.Core
 //---------------------------------------------------------------
 [<Koan(Sort = 15)>]
 module ``about the stock example`` =
+    open System
+    open System.Globalization
     
     let stockData =
         [ "Date,Open,High,Low,Close,Volume,Adj Close";
@@ -58,8 +60,25 @@ module ``about the stock example`` =
     // tests for yourself along the way. You can also try 
     // using the F# Interactive window to check your progress.
 
+    /// function to split a csv row into an array of components
+    let splitCommas (row:string) = row.Split([|','|])
+
+    let strToDouble = System.Double.Parse
+
+    let stockVariance (x:string) (y:string) =
+        abs ((strToDouble x) - (strToDouble y))
+
+    type stockCols =
+        | Date = 0
+        | Open = 1
+        | Close = 4
+
     [<Koan>]
     let YouGotTheAnswerCorrect() =
-        let result =  __
-        
-        AssertEquality "2012-03-13" result
+        let result = 
+            stockData
+                |> Seq.skip 1
+                |> Seq.map splitCommas 
+                |> Seq.maxBy (fun x -> stockVariance x.[int stockCols.Open] x.[int stockCols.Close])
+
+        AssertEquality "2012-03-13" result.[int stockCols.Date]
